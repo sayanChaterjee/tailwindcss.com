@@ -190,12 +190,30 @@ export function RawHighlightedCode({
   return <div className={className} dangerouslySetInnerHTML={{ __html: code }} />;
 }
 
-function cleanCodeForCopy(code:string) {
+function cleanCodeForCopy(code: string) {
   return code
-    .split('\n')
-    .filter(line => !line.includes('[!code highlight'))
-    .join('\n');
+    .split("\n")
+    .map(line => {
+      
+      line = line.replace(/\s*\/\/\s*\[!code.*?\]/g, ""); 
+      line = line.replace(/\s*<!--\s*\[!code.*?\]-->/g, ""); 
+      line = line.replace(/\s*#\s*\[!code.*?\]/g, ""); 
+
+      
+      if (/^[+-]/.test(line.trim())) {
+        line = line.trim().slice(1);
+      }
+
+     
+      if (line.trim() === "…") return "";
+
+      return line;
+    })
+    .filter(line => line.trim() !== "")
+    .join("\n")
+    .trim();
 }
+
 
 function CodeExampleFilename({ filename, code }: { filename: string; code?: string }) {
   return (
